@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heartbeat | Música que te conecta</title>
+  <link rel="stylesheet" href="styles_heartbeat.css">
+</head>
+<body>
+
+  <!-- HEARTBEAT · Prototipo académico sin APIs -->
+  <input class="screen-control" type="radio" name="screen" id="screen-1-control" checked>
+  <input class="screen-control" type="radio" name="screen" id="screen-2-control">
+  <input class="screen-control" type="radio" name="screen" id="screen-3-control">
+  <input class="screen-control" type="radio" name="screen" id="screen-4-control">
+
+  <audio id="preview-audio" preload="metadata"></audio>
+
+  <div class="page-wrap">
+<header class="site-header">
+  <a class="site-brand" href="index.html" aria-label="Heartbeat inicio">
+    <span class="site-brand-heart">♥</span>
+    <span>Heartbeat</span>
+  </a>
+  <nav class="site-nav" aria-label="Navegación principal">
+    <a href="como-funciona.html">Cómo funciona</a>
+    <a href="mis-dedicatorias.html">Mis dedicatorias</a>
+  </nav>
+</header>
+    <div class="phone" aria-label="Prototipo de la aplicación Heartbeat">
+
+      <!-- PANTALLA 1 -->
+      <section class="app-screen" id="screen-1" aria-labelledby="title-screen-1">
+        <main class="screen-main">
+          <section class="hero-block">
+            <div class="brand-mark" aria-label="Heartbeat">
+              <span class="heart">♥</span>
+              <span class="pulse-mini"></span>
+            </div>
+
+            <p class="eyebrow">HEARTBEAT</p>
+            <h1 id="title-screen-1">Exprésate<br>con música</h1>
+            <p>Descubre canciones que van contigo y comparte tu estado de ánimo musical.</p>
+
+            <div class="waveform large-wave" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+
+            <button class="primary-button real-button" type="button" data-go="2">
+              <span>Comenzar</span><span class="arrow">→</span>
+            </button>
+          </section>
+
+          <section class="content-section">
+            <h2>Explora por género</h2>
+            <p class="section-hint">Elige uno para ver canciones relacionadas.</p>
+            <div class="genre-grid">
+              <button class="genre-card genre-pop" type="button" data-genre="Pop">
+                <span class="genre-icon">♫</span><h3>Pop</h3>
+              </button>
+              <button class="genre-card genre-rock" type="button" data-genre="Rock">
+                <span class="genre-icon">♬</span><h3>Rock</h3>
+              </button>
+              <button class="genre-card genre-indie" type="button" data-genre="Indie">
+                <span class="genre-icon">✦</span><h3>Indie</h3>
+              </button>
+              <button class="genre-card genre-rnb" type="button" data-genre="R&B">
+                <span class="genre-icon">♪</span><h3>R&amp;B</h3>
+              </button>
+            </div>
+          </section>
+
+          <div class="branch-links" aria-label="Más de Heartbeat">
+            <a href="como-funciona.html">Conoce cómo funciona <span>→</span></a>
+            <a href="mis-dedicatorias.html">Ver mis dedicatorias <span>→</span></a>
+          </div>
+        </main>
+      </section>
+
+      <!-- PANTALLA 2 -->
+      <section class="app-screen" id="screen-2" aria-labelledby="title-screen-2">
+        <main class="screen-main">
+          <div class="screen-nav">
+            <button class="nav-button" type="button" data-go="1" aria-label="Regresar">←</button>
+            <span>1 de 3</span>
+          </div>
+
+          <section class="content-section top-section">
+            <p class="step-label">PASO 1 · EMOCIÓN Y CONTACTO</p>
+            <h1 id="title-screen-2">¿Qué sientes hoy?</h1>
+            <p>Cuéntame qué está pasando. Heartbeat analizará el momento para encontrar canciones que tengan sentido para ti.</p>
+
+            <label class="field-label" for="recipient-name">¿A quién quieres dedicarla?</label>
+            <div class="search-box">
+              <span class="search-icon" aria-hidden="true"></span>
+              <input id="recipient-name" type="text" placeholder="Escribe un nombre..." maxlength="40">
+            </div>
+
+            <label class="field-label" for="situation">Cuéntame la situación</label>
+            <textarea id="situation" class="situation-input" maxlength="700" placeholder="Ej. Es mi mejor amiga y acaba de conseguir el trabajo que llevaba meses buscando. Quiero decirle que estoy orgullosa de ella, pero sin que suene cursi..."></textarea>
+            <div class="ai-note"><span>✦</span> La IA buscará la emoción y el significado del momento, no solo palabras clave.</div>
+
+            <div class="spotify-connect-box">
+              <div>
+                <strong>Personaliza con tu Spotify</strong>
+                <p id="spotify-status">Opcional: usa tus artistas y canciones más escuchados para ajustar el match.</p>
+              </div>
+              <button id="spotify-connect" class="secondary-button" type="button">Conectar Spotify</button>
+            </div>
+          </section>
+
+          <section class="content-section compact-section">
+            <h2>Estado de ánimo</h2>
+            <div class="chip-grid two-columns mood-options">
+              <button class="chip active" type="button">Feliz</button>
+              <button class="chip" type="button">Tranquilo</button>
+              <button class="chip" type="button">Energético</button>
+              <button class="chip" type="button">Melancólico</button>
+            </div>
+          </section>
+
+          <section class="content-section compact-section">
+            <h2>Géneros favoritos</h2>
+            <div class="chip-grid four-columns genre-options">
+              <button class="chip active" type="button" data-genre-chip="Pop">Pop</button>
+              <button class="chip" type="button" data-genre-chip="Rock">Rock</button>
+              <button class="chip" type="button" data-genre-chip="Indie">Indie</button>
+              <button class="chip" type="button" data-genre-chip="R&B">R&amp;B</button>
+            </div>
+          </section>
+
+          <div class="button-zone">
+            <button class="primary-button real-button" type="button" data-go="3">
+              <span>Buscar mi match</span><span class="arrow">→</span>
+            </button>
+          </div>
+        </main>
+      </section>
+
+      <!-- PANTALLA 3 -->
+      <section class="app-screen" id="screen-3" aria-labelledby="title-screen-3">
+        <main class="screen-main recommendations-main">
+          <div class="screen-nav">
+            <button class="nav-button" type="button" data-go="2" aria-label="Regresar">←</button>
+            <span>2 de 3</span>
+          </div>
+
+          <section class="content-section top-section recommendation-intro">
+            <p class="step-label">PASO 2 · RECOMENDACIONES</p>
+            <h1 id="title-screen-3">¡Tenemos matches!</h1>
+            <p id="recommendation-copy">Escucha una vista previa de 20 segundos y elige la canción que mejor conecte contigo.</p>
+            <span class="genre-result" id="genre-result">Todas las recomendaciones</span>
+            <div class="ai-match-panel" id="ai-match-panel" hidden>
+              <div class="ai-match-top"><span class="ai-spark">✦</span><span>HEARTBEAT AI</span><span id="match-intensity" class="intensity-pill">--%</span></div>
+              <p id="ai-explanation">Analizando tu momento...</p>
+              <div id="ai-profile-chips" class="reason-chips"></div>
+            </div>
+          </section>
+
+          <section class="song-list" id="song-list" aria-label="Canciones recomendadas"></section>
+
+          <section class="content-section match-reasons">
+            <h2>¿Por qué coinciden?</h2>
+            <div class="reason-chips">
+              <span>Género compatible</span>
+              <span>Estado de ánimo</span>
+              <span>Estilo similar</span>
+            </div>
+          </section>
+
+          <div class="button-zone tight">
+            <button class="primary-button real-button" id="continue-selected" type="button">
+              <span>Continuar con <strong id="continue-song-name">Corazón Atómico</strong></span>
+              <span class="arrow">→</span>
+            </button>
+          </div>
+        </main>
+      </section>
+
+      <!-- PANTALLA 4 -->
+      <section class="app-screen" id="screen-4" aria-labelledby="title-screen-4">
+        <main class="screen-main">
+          <div class="screen-nav">
+            <button class="nav-button" type="button" data-go="3" aria-label="Regresar">←</button>
+            <span>3 de 3</span>
+          </div>
+
+          <section class="content-section top-section">
+            <p class="step-label">PASO 3 · COMPARTIR</p>
+            <h1 id="title-screen-4">Tu canción elegida</h1>
+            <p>Escucha hasta un minuto y personaliza tu dedicatoria antes de compartirla.</p>
+          </section>
+
+          <article class="chosen-song-card">
+            <div id="selected-cover" class="album-art art-atomic chosen-cover" aria-label="Portada de Corazón Atómico">
+              <div class="art-heart">♥</div>
+              <small>ZOÉ</small>
+              <strong>Corazón<br>Atómico</strong>
+            </div>
+
+            <div class="chosen-song-info">
+              <span class="selected-badge">SELECCIONADA</span>
+              <h2 id="selected-title">Corazón Atómico</h2>
+              <p id="selected-artist" class="artist">Zoé</p>
+              <p class="one-minute-note">Vista previa extendida · máximo 1:00 min</p>
+            </div>
+
+            <div class="chosen-player">
+              <audio id="selected-audio" controls preload="metadata">
+                <source src="audio/corazon-atomico.mp3" type="audio/mpeg">
+              </audio>
+              <div class="chosen-time-row">
+                <span id="selected-current-time">0:00</span>
+                <span>límite 1:00</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="dedication-card">
+            <div class="dedication-header">
+              <div>
+                <span class="small-label">PARA</span>
+                <h2 id="dedication-name">Tu persona especial</h2>
+              </div>
+              <span class="heart-small">♥</span>
+            </div>
+
+            <label class="field-label" for="dedication-text">Tu dedicatoria</label>
+            <textarea id="dedication-text" maxlength="180">“Siempre hay una canción para cada momento. Espero que te guste.”</textarea>
+            <div class="character-count"><span id="dedication-count">62</span>/180</div>
+          </article>
+
+          <section class="content-section share-section">
+            <h2>Compartir por</h2>
+            <div class="share-grid">
+              <button class="share-card" id="copy-link" type="button" aria-label="Copiar enlace">
+                <span class="share-icon icon-link" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07.07l2-2a5 5 0 0 0-7.07-7.07l-1.15 1.15"/><path d="M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 7 20l1.15-1.15"/></svg>
+                </span>
+                <strong>Copiar enlace</strong>
+              </button>
+
+              <button class="share-card" id="share-instagram" type="button" aria-label="Compartir en Instagram">
+                <span class="share-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.7" r="1"/></svg>
+                </span>
+                <strong>Instagram</strong>
+              </button>
+
+              <button class="share-card" id="share-whatsapp" type="button" aria-label="Compartir en WhatsApp">
+                <span class="share-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M20.1 11.3A8.1 8.1 0 0 1 8 19.2L4 20l.8-3.9A8.1 8.1 0 1 1 20.1 11.3Z"/><path d="M8.5 8.3c.2-.5.4-.6.8-.6h.5c.2 0 .4.1.5.4l.7 1.7c.1.2.1.4-.1.6l-.5.6c.5 1 1.2 1.6 2.2 2.1l.6-.6c.2-.2.4-.2.7-.1l1.6.7c.3.1.4.3.3.6-.2.8-.9 1.4-1.7 1.5-1.4.1-3.2-.8-4.5-2.1-1.4-1.4-2.2-3.1-2-4.8.1-.1.2-.1.9-.1Z"/></svg>
+                </span>
+                <strong>WhatsApp</strong>
+              </button>
+            </div>
+          </section>
+
+          <div class="button-zone share-button-zone">
+            <button class="primary-button real-button" id="send-dedication" type="button">
+              <span>Enviar dedicatoria</span><span class="arrow">→</span>
+            </button>
+          </div>
+        </main>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <script>
+    const previewAudio = document.getElementById('preview-audio');
+    const selectedAudio = document.getElementById('selected-audio');
+    const toast = document.getElementById('toast');
+    const recipientInput = document.getElementById('recipient-name');
+    const situationInput = document.getElementById('situation');
+    const dedicationName = document.getElementById('dedication-name');
+    const dedicationText = document.getElementById('dedication-text');
+    const dedicationCount = document.getElementById('dedication-count');
+    const songList = document.getElementById('song-list');
+    const continueButton = document.getElementById('continue-selected');
+    const continueSongName = document.getElementById('continue-song-name');
+    const selectedTitle = document.getElementById('selected-title');
+    const selectedArtist = document.getElementById('selected-artist');
+    const selectedCover = document.getElementById('selected-cover');
+    const selectedCurrentTime = document.getElementById('selected-current-time');
+    const aiPanel = document.getElementById('ai-match-panel');
+    const aiExplanation = document.getElementById('ai-explanation');
+    const aiProfileChips = document.getElementById('ai-profile-chips');
+    const matchIntensity = document.getElementById('match-intensity');
+    const spotifyStatus = document.getElementById('spotify-status');
+    const spotifyConnect = document.getElementById('spotify-connect');
+
+    let selectedSong = null;
+    let activePreviewCard = null;
+    let previewTimer = null;
+    let spotifyToken = localStorage.getItem('heartbeat_spotify_token') || '';
+    let spotifyProfile = null;
+    let currentPicks = [];
+    let selectedMood = 'Feliz';
+    let selectedGenre = 'Pop';
+    let spotifyConfig = null;
+
+    const fallbackSongs = [
+      {title:'Let Down', artist:'Radiohead', genres:['Rock','Indie'], art:'art-atomic', symbol:'◌', description:'Para momentos de vulnerabilidad, distancia y emociones difíciles de explicar.', file:'audio/corazon-atomico.mp3'},
+      {title:'By Your Side', artist:'Sade', genres:['R&B','Pop'], art:'art-purple', symbol:'♥', description:'Una canción de compañía y devoción para decir “estoy contigo”.', file:'audio/purple-rain.mp3'},
+      {title:'Here Comes the Sun', artist:'The Beatles', genres:['Rock','Pop'], art:'art-latin', symbol:'☼', description:'Para celebrar que después de una etapa difícil vienen días más luminosos.', file:'audio/yo-siempre-contesto.mp3'}
+    ];
+
+    function showScreen(number) {
+      document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('screen-active'));
+      const target = document.getElementById(`screen-${number}`);
+      if (target) target.classList.add('screen-active');
+      if (number !== 3) stopPreview();
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+    document.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => showScreen(Number(button.dataset.go))));
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('visible');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('visible'), 2800);
+    }
+    function formatTime(seconds) {
+      const safe = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
+      return `${Math.floor(safe/60)}:${String(safe%60).padStart(2,'0')}`;
+    }
+    function updateRecipient() { dedicationName.textContent = recipientInput.value.trim() || 'Tu persona especial'; }
+    recipientInput.addEventListener('input', updateRecipient);
+    dedicationText.addEventListener('input', () => dedicationCount.textContent = dedicationText.value.length);
+
+    document.querySelectorAll('.mood-options .chip').forEach(btn => btn.addEventListener('click', () => {
+      document.querySelectorAll('.mood-options .chip').forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active'); selectedMood = btn.textContent.trim();
+    }));
+    document.querySelectorAll('.genre-options .chip').forEach(btn => btn.addEventListener('click', () => {
+      document.querySelectorAll('.genre-options .chip').forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active'); selectedGenre = btn.dataset.genreChip;
+    }));
+    document.querySelectorAll('.genre-card').forEach(card => card.addEventListener('click', () => {
+      selectedGenre = card.dataset.genre;
+      runAnalysis();
+    }));
+
+    async function loadSpotifyConfig() {
+      try { spotifyConfig = await fetch('/api/config').then(r=>r.json()); } catch { spotifyConfig = null; }
+    }
+
+    function randomString(length=64) {
+      const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+      const values=crypto.getRandomValues(new Uint8Array(length));
+      return [...values].map(v=>chars[v%chars.length]).join('');
+    }
+    async function sha256(plain) { return crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain)); }
+    function base64url(buffer) { return btoa(String.fromCharCode(...new Uint8Array(buffer))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+
+    async function connectSpotify() {
+      await loadSpotifyConfig();
+      if (!spotifyConfig?.spotifyClientId) return showToast('Primero agrega SPOTIFY_CLIENT_ID en .env.');
+      const verifier = randomString();
+      const challenge = base64url(await sha256(verifier));
+      localStorage.setItem('heartbeat_pkce_verifier', verifier);
+      const params = new URLSearchParams({
+        client_id: spotifyConfig.spotifyClientId,
+        response_type: 'code',
+        redirect_uri: spotifyConfig.redirectUri,
+        code_challenge_method: 'S256',
+        code_challenge: challenge,
+        scope: 'user-top-read user-read-private user-read-playback-state user-modify-playback-state'
+      });
+      window.location.href = `https://accounts.spotify.com/authorize?${params}`;
+    }
+
+    async function handleSpotifyCallback() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      if (!code) return;
+      const verifier = localStorage.getItem('heartbeat_pkce_verifier');
+      await loadSpotifyConfig();
+      if (!verifier || !spotifyConfig?.spotifyClientId) return showToast('No se pudo completar la conexión con Spotify.');
+      const body = new URLSearchParams({client_id:spotifyConfig.spotifyClientId,grant_type:'authorization_code',code,redirect_uri:spotifyConfig.redirectUri,code_verifier:verifier});
+      const response = await fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+      const data = await response.json();
+      if (!response.ok) return showToast('Spotify rechazó la conexión. Revisa el Redirect URI.');
+      spotifyToken = data.access_token;
+      localStorage.setItem('heartbeat_spotify_token', spotifyToken);
+      localStorage.setItem('heartbeat_spotify_expires', String(Date.now()+data.expires_in*1000));
+      localStorage.removeItem('heartbeat_pkce_verifier');
+      history.replaceState({},'',window.location.pathname);
+      await loadSpotifyProfile();
+    }
+
+    async function spotifyFetch(url, options={}) {
+      if (!spotifyToken) return null;
+      const response = await fetch(url,{...options,headers:{...(options.headers||{}),Authorization:`Bearer ${spotifyToken}`}});
+      if (response.status===401) { localStorage.removeItem('heartbeat_spotify_token'); spotifyToken=''; return null; }
+      if (!response.ok) return null;
+      return response.json();
+    }
+    async function loadSpotifyProfile() {
+      const me = await spotifyFetch('https://api.spotify.com/v1/me');
+      const top = await spotifyFetch('https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=10');
+      if (!me || !top) return;
+      spotifyProfile = {name:me.display_name || 'Spotify', artists:(top.items||[]).map(a=>a.name)};
+      spotifyStatus.textContent = `Conectado como ${spotifyProfile.name}. Ajustaremos el match con tus artistas más escuchados.`;
+      spotifyConnect.textContent = 'Spotify conectado ✓';
+      spotifyConnect.classList.add('connected');
+    }
+    spotifyConnect.addEventListener('click', connectSpotify);
+
+    function stopPreview() {
+      clearInterval(previewTimer); previewTimer=null; previewAudio.pause(); previewAudio.currentTime=0;
+      if(activePreviewCard){
+        activePreviewCard.querySelector('.preview-button')?.classList.remove('playing');
+        activePreviewCard.querySelector('.preview-icon').textContent='▶';
+        activePreviewCard.querySelector('.progress-fill').style.width='0%';
+        activePreviewCard.querySelector('.preview-time').textContent='0:00 / 0:20';
+      }
+      activePreviewCard=null;
+    }
+    function startPreview(card,song){
+      if(activePreviewCard===card){ previewAudio.paused ? previewAudio.play().catch(()=>{}) : previewAudio.pause(); return; }
+      stopPreview(); activePreviewCard=card; previewAudio.src=song.file; previewAudio.currentTime=0;
+      previewAudio.play().catch(()=>showToast('Añade los MP3 de /audio para usar los previews.'));
+      card.querySelector('.preview-button').classList.add('playing'); card.querySelector('.preview-icon').textContent='❚❚';
+      previewTimer=setInterval(()=>{
+        const elapsed=Math.min(previewAudio.currentTime||0,20);
+        card.querySelector('.preview-time').textContent=`${formatTime(elapsed)} / 0:20`;
+        card.querySelector('.progress-fill').style.width=`${elapsed/20*100}%`;
+        if(elapsed>=20) stopPreview();
+      },100);
+    }
+
+    function spotifySearchUrl(song){ return `https://open.spotify.com/search/${encodeURIComponent(`${song.title} ${song.artist}`)}`; }
+    async function enrichWithSpotify(picks){
+      if(!spotifyToken) return picks;
+      const results=[];
+      for(const song of picks.slice(0,5)){
+        const data=await spotifyFetch(`https://api.spotify.com/v1/search?type=track&limit=1&q=${encodeURIComponent(`track:${song.title} artist:${song.artist}`)}`);
+        const track=data?.tracks?.items?.[0];
+        results.push({...song, spotify:track?{id:track.id,uri:track.uri,url:track.external_urls?.spotify,cover:track.album?.images?.[0]?.url}:null});
+      }
+      return results;
+    }
+
+    function tasteScore(song){
+      if(!spotifyProfile) return 0;
+      const artist=song.artist.toLowerCase();
+      return spotifyProfile.artists.some(a=>a.toLowerCase()===artist) ? 8 : 0;
+    }
+    function renderSongs(picks){
+      currentPicks=picks.map(s=>({...s,score:(s.score||0)+tasteScore(s)})).sort((a,b)=>b.score-a.score);
+      songList.innerHTML='';
+      currentPicks.forEach(song=>songList.appendChild(createSongCard(song)));
+      if(currentPicks[0]) selectSong(currentPicks[0], songList.firstElementChild);
+    }
+
+    function createSongCard(song){
+  const card=document.createElement('article');
+  card.className='recommendation-card';
+
+  const match=Math.min(
+    99,
+    Math.max(76,72+(song.score||0)*3)
+  );
+
+  const cover=song.spotify?.cover
+    ? `<img class="spotify-cover" src="${song.spotify.cover}" alt="Portada de ${song.title}">`
+    : `<div class="album-art ${song.art||'art-atomic'}">
+        <div class="art-symbol">${song.symbol||'♥'}</div>
+        <small>${song.artist.toUpperCase()}</small>
+        <strong>${song.title}</strong>
+      </div>`;
+
+  const spotifyPlayer=song.spotify?.id
+    ? `
+      <div class="spotify-preview">
+        <iframe
+          src="https://open.spotify.com/embed/track/${song.spotify.id}?utm_source=generator"
+          width="100%"
+          height="152"
+          frameborder="0"
+          allowfullscreen=""
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy">
+        </iframe>
+      </div>
+    `
+    : `
+      <div class="preview-unavailable">
+        Preview no disponible
+      </div>
+    `;
+
+  card.innerHTML=`
+    <div class="song-cover-wrap">
+      ${cover}
+    </div>
+
+    <div class="recommendation-info">
+
+      <div class="song-heading-row">
+        <div>
+          <h2>${song.title}</h2>
+          <p class="artist">${song.artist}</p>
+        </div>
+
+        <span class="mini-match">
+          ${match}% match
+        </span>
+      </div>
+
+      <p class="song-description">
+        ${song.description||song.matchReason||song.themes||'Una canción que puede acompañar este momento.'}
+      </p>
+
+      ${spotifyPlayer}
+
+      <div class="song-actions">
+
+        <button
+          class="select-song-button"
+          type="button">
+          Elegir canción
+        </button>
+
+        ${
+          song.spotify?.url
+            ? `<a
+                class="spotify-link"
+                href="${song.spotify.url}"
+                target="_blank"
+                rel="noopener">
+                Abrir en Spotify
+              </a>`
+            : ''
+        }
+
+      </div>
+
+    </div>
+  `;
+
+  card
+    .querySelector('.select-song-button')
+    .addEventListener('click',e=>{
+      e.stopPropagation();
+      selectSong(song,card);
+    });
+
+  card.addEventListener('click',e=>{
+    if(!e.target.closest('button,a,iframe')){
+      selectSong(song,card);
+    }
+  });
+
+  return card;
+}
+    function selectSong(song,card){
+      selectedSong=song; document.querySelectorAll('.recommendation-card').forEach(x=>x.classList.remove('selected')); card?.classList.add('selected'); continueSongName.textContent=song.title;
+    }
+
+    async function runAnalysis(){
+      const situation=situationInput.value.trim();
+      if(!situation){ showScreen(2); situationInput.focus(); showToast('Cuéntame primero qué está pasando ♥'); return; }
+      showScreen(3); aiPanel.hidden=false; aiExplanation.textContent='Heartbeat AI está leyendo el contexto emocional...'; aiProfileChips.innerHTML=''; matchIntensity.textContent='…'; songList.innerHTML='<div class="loading-match"><span>✦</span><strong>Buscando tu match...</strong><p>Analizando emoción, contexto y compatibilidad musical.</p></div>';
+      try{
+        const response=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({situation,relationship:recipientInput.value.trim(),mood:selectedMood,genre:selectedGenre})});
+        const data=await response.json(); if(!response.ok) throw new Error(data.error||'Error');
+        aiExplanation.textContent=data.explanation||'Encontramos canciones que pueden acompañar este momento.';
+        const p=data.profile||{}; matchIntensity.textContent=`${p.intensity||86}%`;
+        aiProfileChips.innerHTML=[...(p.themes||[]).slice(0,4)].map(x=>`<span>${x}</span>`).join('');
+        let picks=(data.picks||fallbackSongs).map((x,i)=>({...x,description:x.description||`Conecta con temas de ${x.themes||'este momento emocional'}.`,art:['art-atomic','art-purple','art-latin'][i%3],symbol:['◌','♥','✦'][i%3],file:x.file}));
+        picks=await enrichWithSpotify(picks); renderSongs(picks);
+      }catch(error){ console.error(error); aiExplanation.textContent='No pudimos activar la IA, así que te mostramos el modo demo.'; renderSongs(fallbackSongs); showToast(error.message||'No se pudo analizar.'); }
+    }
+    document.querySelectorAll('[data-go="3"]').forEach(btn=>btn.addEventListener('click',e=>{ if(btn.id==='continue-selected') return; e.preventDefault(); runAnalysis(); }));
+
+    continueButton.addEventListener('click',()=>{
+      if(!selectedSong) return;
+      stopPreview(); selectedTitle.textContent=selectedSong.title; selectedArtist.textContent=selectedSong.artist;
+      selectedCover.className=`album-art ${selectedSong.art||'art-atomic'} chosen-cover`;
+      selectedCover.innerHTML=selectedSong.spotify?.cover?`<img class="spotify-cover chosen-img" src="${selectedSong.spotify.cover}" alt="Portada de ${selectedSong.title}">`:`<div class="art-symbol">${selectedSong.symbol||'♥'}</div><small>${selectedSong.artist.toUpperCase()}</small><strong>${selectedSong.title}</strong>`;
+      if(selectedSong.file){ selectedAudio.src=selectedSong.file; selectedAudio.load(); } else { selectedAudio.removeAttribute('src'); selectedAudio.load(); }
+      showScreen(4); updateRecipient();
+    });
+    selectedAudio.addEventListener('timeupdate',()=>{const current=Math.min(selectedAudio.currentTime||0,60);selectedCurrentTime.textContent=formatTime(current);if(selectedAudio.currentTime>=60){selectedAudio.pause();selectedAudio.currentTime=60;}});
+    selectedAudio.addEventListener('seeking',()=>{if(selectedAudio.currentTime>60)selectedAudio.currentTime=60});
+
+    // ======================================================
+// COMPARTIR DEDICACIÓN
+// ======================================================
+
+function getDedicationText() {
+  const textarea = document.querySelector('.dedication-card textarea');
+
+  const customText = textarea?.value?.trim();
+
+  // Si el usuario escribió algo, usamos eso.
+  if (customText) return customText;
+
+  // Dedicatoria default si no escribió nada.
+  const name = recipientInput.value.trim() || 'ti';
+
+  return `Esta canción me hizo pensar en ${name}. Espero que la escuches y entiendas todo lo que quiero decirte ♥`;
+}
+
+
+function getShareMessage() {
+  const title = selectedSong?.title || 'Esta canción';
+  const artist = selectedSong?.artist || '';
+  const dedication = getDedicationText();
+  const spotifyLink = getSpotifyLink();
+
+  return `HEARTBEAT
+
+${title}${artist ? ` — ${artist}` : ''}
+
+"${dedication}"
+
+${spotifyLink ? `Escúchala en Spotify:\n${spotifyLink}` : ''}`;
+}
+
+
+// ------------------------------------------------------
+// COPIAR ENLACE
+// ------------------------------------------------------
+
+document
+  .getElementById('copy-link')
+  .addEventListener('click', async () => {
+
+    const spotifyLink = getSpotifyLink();
+
+    if (!spotifyLink) {
+      showToast('No encontramos el enlace de Spotify de esta canción.');
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(spotifyLink);
+
+      showToast('Enlace de Spotify copiado ♥');
+    } catch {
+      showToast('No se pudo copiar automáticamente.');
+    }
+
+  });
+
+
+// ------------------------------------------------------
+// WHATSAPP
+// ------------------------------------------------------
+
+document
+  .getElementById('share-whatsapp')
+  .addEventListener('click', () => {
+
+    if (!selectedSong) {
+      showToast('Primero elige una canción ♥');
+      return;
+    }
+
+    const message = getShareMessage();
+
+    const whatsappURL =
+      `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+    window.open(
+      whatsappURL,
+      '_blank',
+      'noopener,noreferrer'
+    );
+
+  });
+
+
+// ------------------------------------------------------
+// INSTAGRAM
+// ------------------------------------------------------
+
+// ======================================================
+// HEARTBEAT STORY GENERATOR
+// ======================================================
+
+function wrapCanvasText(ctx, text, maxWidth) {
+  const words = text.split(' ');
+  const lines = [];
+  let line = '';
+
+  for (const word of words) {
+    const testLine = line ? `${line} ${word}` : word;
+
+    if (ctx.measureText(testLine).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = testLine;
+    }
+  }
+
+  if (line) lines.push(line);
+
+  return lines;
+}
+
+
+function loadStoryImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    // Necesario para intentar dibujar la portada de Spotify
+    // dentro del canvas.
+    img.crossOrigin = 'anonymous';
+
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+
+    img.src = src;
+  });
+}
+
+
+async function createHeartbeatStory() {
+
+  const canvas = document.createElement('canvas');
+
+  // Tamaño vertical tipo Story
+  canvas.width = 1080;
+  canvas.height = 1920;
+
+  const ctx = canvas.getContext('2d');
+
+  const width = canvas.width;
+  const height = canvas.height;
+
+
+  // ----------------------------------------------------
+  // FONDO
+  // ----------------------------------------------------
+
+  const background = ctx.createLinearGradient(
+    0,
+    0,
+    width,
+    height
+  );
+
+  background.addColorStop(0, '#f8f2e9');
+  background.addColorStop(0.48, '#f3e7e7');
+  background.addColorStop(1, '#e7f0f4');
+
+  ctx.fillStyle = background;
+  ctx.fillRect(0, 0, width, height);
+
+
+  // Mancha decorativa vino
+
+  const glow1 = ctx.createRadialGradient(
+    80,
+    100,
+    0,
+    80,
+    100,
+    500
+  );
+
+  glow1.addColorStop(
+    0,
+    'rgba(164,59,88,.22)'
+  );
+
+  glow1.addColorStop(
+    1,
+    'rgba(164,59,88,0)'
+  );
+
+  ctx.fillStyle = glow1;
+  ctx.fillRect(0, 0, 600, 650);
+
+
+  // Mancha decorativa azul
+
+  const glow2 = ctx.createRadialGradient(
+    1000,
+    1750,
+    0,
+    1000,
+    1750,
+    550
+  );
+
+  glow2.addColorStop(
+    0,
+    'rgba(46,120,163,.20)'
+  );
+
+  glow2.addColorStop(
+    1,
+    'rgba(46,120,163,0)'
+  );
+
+  ctx.fillStyle = glow2;
+  ctx.fillRect(
+    450,
+    1200,
+    630,
+    720
+  );
+
+
+  // ----------------------------------------------------
+  // HEARTBEAT
+  // ----------------------------------------------------
+
+  ctx.textAlign = 'center';
+
+  ctx.fillStyle = '#a43b58';
+
+  ctx.font =
+    '700 32px "DM Sans", Arial, sans-serif';
+
+  ctx.fillText(
+    '♥  HEARTBEAT',
+    width / 2,
+    125
+  );
+
+
+  // ----------------------------------------------------
+  // SUBTÍTULO
+  // ----------------------------------------------------
+
+  ctx.fillStyle = '#77716d';
+
+  ctx.font =
+    '600 22px "DM Sans", Arial, sans-serif';
+
+  ctx.fillText(
+    'UNA CANCIÓN PARA DECIR LO QUE SIENTES',
+    width / 2,
+    175
+  );
+
+
+  // ----------------------------------------------------
+  // PORTADA
+  // ----------------------------------------------------
+
+  const coverSize = 650;
+
+  const coverX =
+    (width - coverSize) / 2;
+
+  const coverY = 280;
+
+  const radius = 40;
+
+
+  // Sombra
+
+  ctx.save();
+
+  ctx.shadowColor =
+    'rgba(20,43,61,.18)';
+
+  ctx.shadowBlur = 45;
+
+  ctx.shadowOffsetY = 20;
+
+  ctx.fillStyle = '#ffffff';
+
+  ctx.beginPath();
+
+  ctx.roundRect(
+    coverX,
+    coverY,
+    coverSize,
+    coverSize,
+    radius
+  );
+
+  ctx.fill();
+
+  ctx.restore();
+
+
+  // Intentamos cargar la portada real de Spotify
+
+  if (selectedSong?.spotify?.cover) {
+
+    try {
+
+      const cover =
+        await loadStoryImage(
+          selectedSong.spotify.cover
+        );
+
+      ctx.save();
+
+      ctx.beginPath();
+
+      ctx.roundRect(
+        coverX,
+        coverY,
+        coverSize,
+        coverSize,
+        radius
+      );
+
+      ctx.clip();
+
+      ctx.drawImage(
+        cover,
+        coverX,
+        coverY,
+        coverSize,
+        coverSize
+      );
+
+      ctx.restore();
+
+    } catch (error) {
+
+      console.warn(
+        'No se pudo cargar la portada para la Story.',
+        error
+      );
+
+      ctx.fillStyle = '#a43b58';
+
+      ctx.font =
+        '700 130px Arial';
+
+      ctx.fillText(
+        '♥',
+        width / 2,
+        coverY + 370
+      );
+
+    }
+
+  }
+
+
+  // ----------------------------------------------------
+  // CANCIÓN
+  // ----------------------------------------------------
+
+  const title =
+    selectedSong?.title ||
+    'Tu canción';
+
+  const artist =
+    selectedSong?.artist ||
+    '';
+
+
+  ctx.fillStyle = '#142b3d';
+
+  ctx.font =
+    '700 54px "DM Sans", Arial, sans-serif';
+
+  const titleLines =
+    wrapCanvasText(
+      ctx,
+      title,
+      850
+    ).slice(0, 2);
+
+
+  let titleY = 1040;
+
+  titleLines.forEach(
+    (line, index) => {
+
+      ctx.fillText(
+        line,
+        width / 2,
+        titleY + index * 62
+      );
+
+    }
+  );
+
+
+  // ----------------------------------------------------
+  // ARTISTA
+  // ----------------------------------------------------
+
+  const artistY =
+    titleY +
+    titleLines.length * 62 +
+    18;
+
+  ctx.fillStyle = '#77716d';
+
+  ctx.font =
+    '500 30px "DM Sans", Arial, sans-serif';
+
+  ctx.fillText(
+    artist,
+    width / 2,
+    artistY
+  );
+
+
+  // ----------------------------------------------------
+  // DIVISOR
+  // ----------------------------------------------------
+
+  const dividerY =
+    artistY + 70;
+
+  const divider =
+    ctx.createLinearGradient(
+      240,
+      0,
+      840,
+      0
+    );
+
+  divider.addColorStop(
+    0,
+    '#a43b58'
+  );
+
+  divider.addColorStop(
+    1,
+    '#2e78a3'
+  );
+
+  ctx.fillStyle = divider;
+
+  ctx.fillRect(
+    290,
+    dividerY,
+    500,
+    4
+  );
+
+
+  // ----------------------------------------------------
+  // DEDICATORIA
+  // ----------------------------------------------------
+
+  const dedication =
+    getDedicationText();
+
+  ctx.fillStyle = '#3d5262';
+
+  ctx.font =
+    '500 34px "DM Sans", Arial, sans-serif';
+
+  const dedicationLines =
+    wrapCanvasText(
+      ctx,
+      `“${dedication}”`,
+      800
+    ).slice(0, 7);
+
+
+  let dedicationY =
+    dividerY + 100;
+
+  dedicationLines.forEach(
+    (line, index) => {
+
+      ctx.fillText(
+        line,
+        width / 2,
+        dedicationY + index * 49
+      );
+
+    }
+  );
+
+
+  // ----------------------------------------------------
+  // PARA...
+  // ----------------------------------------------------
+
+  const recipient =
+    recipientInput.value.trim();
+
+  if (recipient) {
+
+    const recipientY =
+      dedicationY +
+      dedicationLines.length * 49 +
+      55;
+
+    ctx.fillStyle = '#a43b58';
+
+    ctx.font =
+      '700 25px "DM Sans", Arial, sans-serif';
+
+    ctx.fillText(
+      `Para ${recipient} ♥`,
+      width / 2,
+      recipientY
+    );
+
+  }
+
+
+  // ----------------------------------------------------
+  // FOOTER
+  // ----------------------------------------------------
+
+  ctx.fillStyle = '#77716d';
+
+  ctx.font =
+    '500 20px "DM Sans", Arial, sans-serif';
+
+  ctx.fillText(
+    'Creado con Heartbeat',
+    width / 2,
+    1810
+  );
+
+
+  ctx.fillStyle = '#a43b58';
+
+  ctx.font =
+    '700 24px "DM Sans", Arial, sans-serif';
+
+  ctx.fillText(
+    '♥',
+    width / 2,
+    1850
+  );
+
+
+  // ----------------------------------------------------
+  // CONVERTIR CANVAS A ARCHIVO
+  // ----------------------------------------------------
+
+  return new Promise(resolve => {
+
+    canvas.toBlob(
+      blob => {
+
+        const file =
+          new File(
+            [blob],
+            'heartbeat-story.png',
+            {
+              type: 'image/png'
+            }
+          );
+
+        resolve({
+          blob,
+          file
+        });
+
+      },
+      'image/png',
+      1
+    );
+
+  });
+
+}
+
+
+// ======================================================
+// INSTAGRAM
+// ======================================================
+
+document
+  .getElementById('share-instagram')
+  .addEventListener('click', async () => {
+
+    if (!selectedSong) {
+
+      showToast(
+        'Primero elige una canción ♥'
+      );
+
+      return;
+
+    }
+
+
+    showToast(
+      'Creando tu Story de Heartbeat...'
+    );
+
+
+    try {
+
+      const { blob, file } =
+        await createHeartbeatStory();
+
+
+      // Copiamos el enlace de Spotify aparte
+      // para que el usuario pueda pegarlo.
+
+      const spotifyLink =
+        getSpotifyLink();
+
+      if (spotifyLink) {
+
+        try {
+
+          await navigator.clipboard.writeText(
+            spotifyLink
+          );
+
+        } catch (error) {
+
+          console.warn(
+            'No se pudo copiar el enlace.',
+            error
+          );
+
+        }
+
+      }
+
+
+      // ------------------------------------------------
+      // SI EL NAVEGADOR PERMITE COMPARTIR ARCHIVOS
+      // ------------------------------------------------
+
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({
+          files: [file]
+        })
+      ) {
+
+        await navigator.share({
+
+          files: [file],
+
+          title:
+            `${selectedSong.title} · Heartbeat`,
+
+          text:
+            getDedicationText()
+
+        });
+
+
+        showToast(
+          'Tu Story está lista ♥'
+        );
+
+        return;
+
+      }
+
+
+      // ------------------------------------------------
+      // FALLBACK EN COMPUTADORA:
+      // DESCARGAR LA CARD
+      // ------------------------------------------------
+
+      const url =
+        URL.createObjectURL(blob);
+
+      const link =
+        document.createElement('a');
+
+      link.href = url;
+
+      link.download =
+        'heartbeat-story.png';
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+
+      setTimeout(
+        () => URL.revokeObjectURL(url),
+        1000
+      );
+
+
+      showToast(
+        'Story guardada y enlace de Spotify copiado ♥'
+      );
+
+
+      // Abrimos Instagram después de guardar la imagen
+
+      setTimeout(() => {
+
+        window.open(
+          'https://www.instagram.com/',
+          '_blank',
+          'noopener,noreferrer'
+        );
+
+      }, 700);
+
+
+    } catch (error) {
+
+      console.error(
+        'Error creando Story:',
+        error
+      );
+
+
+      // Si el usuario simplemente cerró
+      // el menú de compartir, no es un error real.
+
+      if (
+        error?.name === 'AbortError'
+      ) {
+
+        showToast(
+          'Compartir cancelado.'
+        );
+
+        return;
+
+      }
+
+
+      showToast(
+        'No pudimos crear la Story.'
+      );
+
+    }
+
+  });
+
+    document.getElementById('send-dedication').addEventListener('click',()=>showToast('¡Dedicatoria lista para compartir! ♥'));
+
+    (async()=>{await handleSpotifyCallback();await loadSpotifyConfig();if(spotifyToken)await loadSpotifyProfile();updateRecipient();dedicationCount.textContent=dedicationText.value.length;renderSongs(fallbackSongs);showScreen(1);})();
+  </script>
+  <script src="/spotify.js"></script>
+</body>
+</html>
