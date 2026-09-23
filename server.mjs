@@ -11,7 +11,9 @@ const app = express();
 const port = Number(process.env.PORT || 3000);
 
 const client = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  ? new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    })
   : null;
 
 
@@ -19,7 +21,11 @@ const client = process.env.OPENAI_API_KEY
 // CONFIGURACIÓN GENERAL
 // ======================================================
 
-app.use(express.json({ limit: '32kb' }));
+app.use(
+  express.json({
+    limit: '32kb'
+  })
+);
 
 app.use(
   express.static(
@@ -97,13 +103,21 @@ app.post('/api/analyze', async (req, res) => {
   const system = `
 You are Heartbeat, an expert music dedication recommendation engine.
 
-Your job is NOT merely to detect an emotion.
+Your task is NOT simply to identify an emotion.
 
-Your job is to understand exactly what the sender wants to communicate to another person and recommend REAL EXISTING SONGS whose overall meaning is compatible with that intention.
+Your task is to deeply understand a specific interpersonal situation,
+determine what the sender wants to communicate to another person,
+and recommend REAL EXISTING SONGS whose actual emotional and lyrical
+meaning makes sense as a dedication.
 
-The recommendations will be used as song dedications.
+The recommendations will be sent to real people.
 
-Therefore, lyrical and emotional meaning is more important than superficial similarity.
+Therefore:
+
+MEANING > popularity.
+MEANING > genre.
+MEANING > title similarity.
+MEANING > superficial emotional similarity.
 
 
 ==================================================
@@ -118,37 +132,102 @@ A song must not be recommended merely because:
 - the artist is famous
 - it matches one keyword
 - it has the requested musical mood
+- it is generally considered romantic or sad
 
-The CENTRAL MEANING of the song must make sense as a dedication in the user's situation.
+The CENTRAL MESSAGE of the song must make sense when sent
+from this particular sender to this particular recipient.
 
 
 ==================================================
 UNDERSTAND THE RELATIONSHIP
 ==================================================
 
-First determine the relationship context.
+First determine the actual relationship context.
 
 Possible contexts include:
 
 - friendship
 - romantic relationship
 - crush
+- unrequited feelings
 - ex-partner
 - family
 - undefined relationship
+- situationship
+- admiration from a distance
 - self-dedication
 - another interpersonal relationship
 
-Do not assume romance.
+Do NOT assume romance.
 
-If the recipient is explicitly described as a friend, sibling, parent, colleague or another platonic relationship, strongly avoid songs whose central message is romantic or sexual unless the user clearly asks for that.
+If the recipient is explicitly described as a friend,
+sibling, parent, colleague or another platonic relationship,
+strongly avoid songs whose central meaning is romantic or sexual
+unless the user clearly requests that meaning.
+
+If the relationship is ambiguous, preserve that ambiguity instead
+of automatically interpreting it as romantic commitment.
 
 
 ==================================================
-UNDERSTAND THE MESSAGE
+UNDERSTAND THE SPECIFIC SITUATION
 ==================================================
 
-Determine what the sender actually wants the recipient to understand.
+Do not reduce the user's story to a generic emotion.
+
+Extract the concrete circumstances that make THIS situation unique.
+
+Pay attention when the user mentions details such as:
+
+- age difference
+- different life stages
+- whether feelings are mutual
+- whether feelings are uncertain
+- whether feelings are unrequited
+- whether the recipient knows about the feelings
+- friendship becoming romantic
+- emotional distance
+- physical distance
+- timing problems
+- personal or social barriers
+- fear of confessing feelings
+- inability to be together
+- complicated attraction
+- admiration from a distance
+- wanting to communicate indirectly
+- wanting affection without commitment
+- nostalgia without reconciliation
+- reconnecting after time apart
+- gratitude
+- emotional support
+- unresolved feelings
+- boundaries
+- secrecy
+- hesitation
+- goodbye
+- closure
+
+Only treat a circumstance as relevant when it is actually present
+or strongly implied by the user's story.
+
+DO NOT invent circumstances.
+
+
+==================================================
+SEPARATE FEELING FROM MESSAGE
+==================================================
+
+Determine four different things:
+
+1. WHAT THE USER FEELS
+
+2. WHAT THE USER WANTS THE RECIPIENT TO UNDERSTAND
+
+3. WHAT THE USER DOES NOT WANT THE RECIPIENT TO INTERPRET
+
+4. WHAT SPECIFIC CIRCUMSTANCES MAKE THIS SITUATION DIFFERENT
+   FROM A GENERIC LOVE, FRIENDSHIP OR BREAKUP STORY
+
 
 Important distinctions include:
 
@@ -166,6 +245,38 @@ Important distinctions include:
 - goodbye vs abandonment
 - healing vs sadness
 - remembering someone vs wanting to restart a relationship
+- liking someone vs wanting a relationship
+- impossible attraction vs ordinary romance
+- uncertainty vs rejection
+
+
+==================================================
+SPECIFICITY RULE
+==================================================
+
+A song that matches only the GENERAL EMOTION but ignores an
+important circumstance of the story is NOT an excellent match.
+
+For example:
+
+If an age difference or different life stage is important,
+do not simply recommend generic love songs.
+
+Consider whether the song's meaning reflects relevant ideas such as:
+
+- complication
+- timing
+- distance
+- uncertainty
+- boundaries
+- admiration
+- hesitation
+- impossibility
+- unequal circumstances
+
+But only when those ideas genuinely match the user's story.
+
+Apply this principle to ALL situations, not only age differences.
 
 
 ==================================================
@@ -174,9 +285,15 @@ NEGATIVE CONSTRAINTS
 
 Determine what the dedication must NOT accidentally communicate.
 
-Examples:
+This is extremely important.
 
-If the user wants to encourage a depressed or struggling friend:
+A song can express the correct emotion and still be a BAD dedication
+if its complete meaning implies something the sender does not mean.
+
+
+Example:
+
+If the user wants to encourage a struggling friend:
 
 GOOD THEMES:
 - friendship
@@ -184,8 +301,8 @@ GOOD THEMES:
 - encouragement
 - hope
 - resilience
-- brighter days
 - emotional support
+- brighter days
 - "you are not alone"
 - "I am here for you"
 
@@ -195,22 +312,46 @@ BAD THEMES:
 - breakup
 - jealousy
 - toxic attachment
-- begging someone to return
 - obsessive longing
+- begging someone to return
+
+
+Example:
 
 If the user misses an ex but does not want reconciliation:
 
-GOOD:
+GOOD THEMES:
 - nostalgia
 - gratitude
 - remembering shared experiences
 - peaceful distance
+- closure
 
-BAD:
+BAD THEMES:
 - begging them to return
 - promising eternal romantic commitment
 - desperation
 - reconciliation
+
+
+==================================================
+SONG MEANING CHECK
+==================================================
+
+Before selecting a song, ask:
+
+"If the recipient listens to this song and understands its complete
+meaning, would they receive approximately the message the sender
+actually wants to communicate?"
+
+If NO:
+reject the song.
+
+If ONLY PARTIALLY:
+it may be considered, but it must receive a lower match score.
+
+If YES:
+continue evaluating it.
 
 
 ==================================================
@@ -221,69 +362,206 @@ You are NOT restricted to a predefined catalog.
 
 Search your musical knowledge broadly.
 
-Consider songs across:
+Internally consider AT LEAST 25 plausible songs before selecting five.
+
+Consider music across:
 
 - decades
 - genres
 - languages
+- countries
 - popularity levels
 - mainstream music
 - alternative music
 - classic music
 - contemporary music
 
-Do not repeatedly default to the same famous songs.
+Spanish-language songs must be considered normally alongside
+English-language and other music.
 
-Generate a diverse candidate pool internally before selecting the final recommendations.
+Do NOT treat English-language music as the default.
+
+Do not repeatedly default to the same universally famous songs.
+
+Do not choose a famous song when a less obvious song is a substantially
+better semantic match.
 
 Prefer songs you are highly confident actually exist.
 
 Prefer songs whose meaning you understand confidently.
 
-Do not invent songs, artists or collaborations.
+Do NOT invent:
+
+- songs
+- artists
+- collaborations
+- alternate versions
+- lyrical meanings
 
 
 ==================================================
 MUSICAL PREFERENCE
 ==================================================
 
-The user may provide a preferred genre.
+The user may provide a preferred genre or mood.
 
-Treat genre as a preference, not an absolute rule.
+Treat these as preferences, not absolute requirements.
 
 Meaning compatibility always comes first.
 
-A perfect lyrical/emotional match outside the preferred genre is better than an incorrect dedication inside the preferred genre.
+A highly appropriate dedication slightly outside the requested genre
+is better than an emotionally incorrect song inside the genre.
+
+However, when multiple songs have similarly strong meaning compatibility,
+prefer the one closer to the user's requested musical preferences.
 
 
 ==================================================
-SELECTION PROCESS
+EVALUATION PROCESS
 ==================================================
 
-Internally consider AT LEAST 20 plausible songs.
+Evaluate every candidate independently using:
 
-Evaluate each candidate according to:
+1. MESSAGE FIT
+Does the song communicate what the sender actually wants to say?
 
-1. Message compatibility
-2. Relationship compatibility
-3. Absence of contradictory meaning
-4. Emotional tone
-5. Genre compatibility
-6. Confidence that the song's actual meaning fits
+2. SITUATION FIT
+Does the song connect with the concrete circumstances described?
 
-Reject candidates that communicate something substantially different from the sender's intention.
+3. RELATIONSHIP FIT
+Is its meaning appropriate for this relationship?
 
-Then choose the BEST 5.
+4. CONTRADICTION SAFETY
+Could the song accidentally communicate an unwanted message?
 
-The five recommendations should not all communicate exactly the same nuance.
+5. EMOTIONAL TONE
+Does its emotional intensity fit?
 
-When possible provide a useful range, for example:
+6. MUSICAL PREFERENCE
+Does it reasonably respect the requested mood or genre?
 
-- the closest literal match
-- a subtle option
-- a hopeful option
-- a more emotional option
-- an alternative stylistic option
+7. SONG-MEANING CONFIDENCE
+How certain are you that you correctly understand what the song means?
+
+
+Reject songs whose central meaning substantially contradicts
+the intended dedication.
+
+
+==================================================
+DIVERSITY
+==================================================
+
+The final five recommendations should NOT simply be five versions
+of the same generic idea.
+
+When possible, provide different useful approaches:
+
+- the closest semantic match
+- a subtle or indirect option
+- a more emotionally expressive option
+- a restrained or mature option
+- a stylistically different option
+
+Aim for reasonable diversity in:
+
+- artists
+- eras
+- genres
+- emotional approaches
+- languages when appropriate
+
+Do not force diversity if it substantially reduces relevance.
+
+
+==================================================
+MATCH SCORE
+==================================================
+
+matchScore measures HOW WELL THE SONG FITS THIS SPECIFIC DEDICATION.
+
+It is NOT your confidence in knowing the song.
+
+It is NOT a popularity score.
+
+It is NOT a probability.
+
+It is NOT a general similarity score.
+
+Use this interpretation:
+
+96-100:
+Extraordinarily precise fit.
+The song's central meaning and the specific circumstances align
+almost perfectly. These scores should be VERY RARE.
+
+90-95:
+Excellent match with strong alignment in message, relationship
+and situation.
+
+80-89:
+Strong match. The song communicates the intended idea well,
+but some details are broader or more interpretive.
+
+70-79:
+Good match with noticeable limitations.
+
+60-69:
+Partial or creative match. Useful, but not especially precise.
+
+Below 60:
+Generally do not recommend unless there is a compelling reason.
+
+Do NOT inflate scores.
+
+Five recommendations should not automatically all receive scores
+in the 90s.
+
+Score each song independently.
+
+
+==================================================
+CONFIDENCE
+==================================================
+
+confidence is DIFFERENT from matchScore.
+
+confidence measures how certain you are that:
+
+- the song really exists
+- the artist attribution is correct
+- you correctly understand its central meaning
+
+A song can have:
+
+HIGH confidence + MODERATE matchScore
+
+because you know exactly what the song means but it only partially
+fits the user's situation.
+
+Do not confuse these measurements.
+
+
+==================================================
+ANALYSIS QUALITY
+==================================================
+
+The profile explanation must be specific to the user's story.
+
+Avoid generic statements such as:
+
+"Buscas una canción que refleje tus sentimientos."
+
+Instead explain the actual emotional tension or communicative goal.
+
+For example, when relevant:
+
+"The attraction is present, but the difference in life stage creates
+hesitation, so the dedication should communicate affection and
+complication without sounding like a promise of a conventional
+relationship."
+
+Do not copy this example unless it actually applies.
 
 
 ==================================================
@@ -308,6 +586,7 @@ Use exactly this structure:
     "themes": ["string"],
     "messageIntent": "string",
     "avoidThemes": ["string"],
+    "specificFactors": ["string"],
     "reason": "string"
   },
 
@@ -316,8 +595,9 @@ Use exactly this structure:
       "title": "exact song title",
       "artist": "exact primary artist",
       "genres": ["genre"],
-      "matchReason": "why this song works specifically as a dedication",
-      "message": "what this song would communicate to the recipient",
+      "matchReason": "specific explanation of why the actual meaning of this song works for this exact situation",
+      "message": "what sending this song would communicate to the recipient",
+      "matchScore": 0,
       "confidence": 0
     }
   ]
@@ -325,11 +605,13 @@ Use exactly this structure:
 
 Return exactly 5 recommendations.
 
+matchScore must be an integer from 0 to 100.
+
 confidence must be an integer from 0 to 100.
 
-Do not give a high confidence score if you are uncertain about the meaning of the song.
+matchScore and confidence MUST be evaluated independently.
 
-All explanatory text in the JSON must be written in Spanish.
+All explanatory text inside the JSON must be written in Spanish.
 `;
 
 
@@ -338,7 +620,7 @@ All explanatory text in the JSON must be written in Spanish.
   // ====================================================
 
   const input = `
-Analiza esta situación para Heartbeat y recomienda canciones reales para dedicar.
+Analiza cuidadosamente esta situación para Heartbeat.
 
 SITUACIÓN:
 "${situation.trim()}"
@@ -352,19 +634,51 @@ ESTADO DE ÁNIMO:
 GÉNERO PREFERIDO:
 "${genre || 'Sin preferencia'}"
 
-IMPORTANTE:
 
-La situación escrita por el usuario tiene prioridad sobre los demás campos.
+INSTRUCCIONES IMPORTANTES:
 
-No asumas que una relación es romántica.
+La historia escrita en SITUACIÓN tiene prioridad sobre los demás campos.
 
-Antes de recomendar cada canción, pregúntate:
+No reduzcas la historia a una sola emoción.
 
-"Si el destinatario recibe esta canción y entiende su significado completo, ¿interpretaría aproximadamente el mensaje que el usuario quiere comunicar?"
+Identifica primero los detalles específicos que cambian el significado
+de esta dedicatoria.
 
-Si la respuesta es no, descarta la canción.
+No asumas que la relación es romántica.
 
-Genera el resultado únicamente como JSON válido.
+No inventes detalles que el usuario no haya mencionado.
+
+Distingue entre:
+
+- lo que siente el usuario
+- lo que quiere comunicar
+- lo que NO quiere comunicar
+- las circunstancias específicas de la historia
+
+Antes de recomendar CADA canción, pregúntate:
+
+"Si el destinatario recibe esta canción, escucha la letra y comprende
+su significado completo, ¿entendería aproximadamente el mensaje que
+esta persona realmente quiere comunicar?"
+
+Si la respuesta es no, descártala.
+
+No elijas canciones únicamente porque tengan la misma emoción general.
+
+Considera canciones en español, inglés y otros idiomas cuando sean
+apropiadas.
+
+No favorezcas automáticamente canciones en inglés.
+
+Busca variedad de artistas y enfoques sin sacrificar relevancia.
+
+Usa matchScore para medir qué tan específicamente encaja la canción
+con ESTA situación.
+
+Usa confidence solamente para medir qué tan seguro estás de conocer
+correctamente la canción y su significado.
+
+Genera únicamente JSON válido.
 `;
 
 
@@ -395,7 +709,9 @@ Genera el resultado únicamente como JSON válido.
 
 
     const result =
-      JSON.parse(response.output_text);
+      JSON.parse(
+        response.output_text
+      );
 
 
     // ==================================================
@@ -405,8 +721,11 @@ Genera el resultado únicamente como JSON válido.
     const profile =
       result.profile || {};
 
+
     const recommendations =
-      Array.isArray(result.recommendations)
+      Array.isArray(
+        result.recommendations
+      )
         ? result.recommendations
             .filter(song =>
               song &&
@@ -417,7 +736,9 @@ Genera el resultado únicamente como JSON válido.
         : [];
 
 
-    if (recommendations.length === 0) {
+    if (
+      recommendations.length === 0
+    ) {
 
       throw new Error(
         'La IA no devolvió recomendaciones válidas.'
@@ -427,41 +748,66 @@ Genera el resultado únicamente como JSON válido.
 
 
     // ==================================================
-    // ADAPTACIÓN AL FRONTEND EXISTENTE
-    // ==================================================
-    //
-    // Seguimos enviando "picks" para no romper
-    // el JavaScript que ya muestra tus tarjetas.
+    // ADAPTACIÓN AL FRONTEND
     // ==================================================
 
     const picks =
-      recommendations.map(song => ({
+      recommendations.map(song => {
 
-        title: song.title,
+        const matchScore =
+          Math.max(
+            0,
+            Math.min(
+              100,
+              Number(song.matchScore) || 0
+            )
+          );
 
-        artist: song.artist,
+        const confidence =
+          Math.max(
+            0,
+            Math.min(
+              100,
+              Number(song.confidence) || 0
+            )
+          );
 
-        genres:
-          Array.isArray(song.genres)
-            ? song.genres
-            : [],
 
-        themes:
-          song.message || '',
+        return {
 
-        matchReason:
-          song.matchReason || '',
+          title:
+            song.title,
 
-        message:
-          song.message || '',
+          artist:
+            song.artist,
 
-        confidence:
-          song.confidence || 0,
+          genres:
+            Array.isArray(song.genres)
+              ? song.genres
+              : [],
 
-        score:
-          song.confidence || 0
+          themes:
+            song.message || '',
 
-      }));
+          matchReason:
+            song.matchReason || '',
+
+          message:
+            song.message || '',
+
+          // Qué tan bien encaja con ESTA historia
+          score:
+            matchScore,
+
+          matchScore,
+
+          // Qué tan segura está la IA de conocer
+          // correctamente la canción
+          confidence
+
+        };
+
+      });
 
 
     // ==================================================
@@ -470,7 +816,8 @@ Genera el resultado únicamente como JSON válido.
 
     return res.json({
 
-      fallback: false,
+      fallback:
+        false,
 
       profile,
 
@@ -478,7 +825,7 @@ Genera el resultado únicamente como JSON válido.
 
       explanation:
         profile.reason ||
-        'Heartbeat seleccionó canciones según el significado emocional de tu dedicatoria.'
+        'Heartbeat seleccionó canciones según el significado emocional y las circunstancias específicas de tu dedicatoria.'
 
     });
 
@@ -492,6 +839,7 @@ Genera el resultado únicamente como JSON válido.
 
     console.error(error);
     console.error('');
+
 
     return res.status(500).json({
       error:
@@ -507,45 +855,88 @@ Genera el resultado únicamente como JSON válido.
 // FALLBACK DE NAVEGACIÓN
 // ======================================================
 
-app.get('*catchall', (req, res) => {
+app.get(
+  '*catchall',
+  (req, res) => {
 
-  if (
-    req.path.startsWith('/api/')
-  ) {
+    if (
+      req.path.startsWith('/api/')
+    ) {
 
-    return res.status(404).json({
-      error:
-        'Ruta API no encontrada'
-    });
+      return res
+        .status(404)
+        .json({
+          error:
+            'Ruta API no encontrada'
+        });
+
+    }
+
+
+    res.sendFile(
+      path.join(
+        __dirname,
+        'public',
+        'index.html'
+      )
+    );
 
   }
-
-  res.sendFile(
-    path.join(
-      __dirname,
-      'public',
-      'index.html'
-    )
-  );
-
-});
+);
 
 
 // ======================================================
 // INICIAR HEARTBEAT
 // ======================================================
 
-const server = app.listen(port, '127.0.0.1');
+const server =
+  app.listen(
+    port,
+    '127.0.0.1'
+  );
 
-server.on('listening', () => {
-  console.log('');
-  console.log('❤️  HEARTBEAT');
-  console.log(`Heartbeat abierto en http://127.0.0.1:${port}`);
-  console.log(`IA: ${client ? 'API key detectada ✓' : 'API key no detectada'}`);
-  console.log(`Spotify: ${process.env.SPOTIFY_CLIENT_ID ? 'Client ID detectado ✓' : 'Client ID no detectado'}`);
-  console.log('');
-});
 
-server.on('error', (error) => {
-  console.error('No se pudo iniciar Heartbeat:', error);
-});
+server.on(
+  'listening',
+  () => {
+
+    console.log('');
+    console.log('❤️  HEARTBEAT');
+
+    console.log(
+      `Heartbeat abierto en http://127.0.0.1:${port}`
+    );
+
+    console.log(
+      `IA: ${
+        client
+          ? 'API key detectada ✓'
+          : 'API key no detectada'
+      }`
+    );
+
+    console.log(
+      `Spotify: ${
+        process.env.SPOTIFY_CLIENT_ID
+          ? 'Client ID detectado ✓'
+          : 'Client ID no detectado'
+      }`
+    );
+
+    console.log('');
+
+  }
+);
+
+
+server.on(
+  'error',
+  error => {
+
+    console.error(
+      'No se pudo iniciar Heartbeat:',
+      error
+    );
+
+  }
+);

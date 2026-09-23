@@ -464,10 +464,13 @@
   const card=document.createElement('article');
   card.className='recommendation-card';
 
-  const match=Math.min(
-    99,
-    Math.max(76,72+(song.score||0)*3)
-  );
+const match = Math.max(
+  0,
+  Math.min(
+    100,
+    Math.round(Number(song.score) || 0)
+  )
+);
 
   const cover=song.spotify?.cover
     ? `<img class="spotify-cover" src="${song.spotify.cover}" alt="Portada de ${song.title}">`
