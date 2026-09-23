@@ -3,10 +3,10 @@
 // Authorization Code with PKCE
 // ==========================================
 
-const SPOTIFY_REDIRECT_URI = 'http://127.0.0.1:3000/';
 const SPOTIFY_SCOPES = 'user-top-read';
 
 let spotifyClientId = '';
+let spotifyRedirectUri = '';
 
 
 // ==========================================
@@ -19,6 +19,7 @@ async function loadSpotifyConfig() {
     const config = await response.json();
 
     spotifyClientId = config.spotifyClientId;
+    spotifyRedirectUri = config.redirectUri;
 
     if (!spotifyClientId) {
       console.warn('Spotify Client ID no encontrado.');
@@ -120,7 +121,7 @@ async function connectSpotify() {
     scope: SPOTIFY_SCOPES,
     code_challenge_method: 'S256',
     code_challenge: codeChallenge,
-    redirect_uri: SPOTIFY_REDIRECT_URI
+    redirect_uri: spotifyRedirectUri
   };
 
   authUrl.search = new URLSearchParams(
@@ -166,7 +167,7 @@ async function getSpotifyToken(code) {
         client_id: spotifyClientId,
         grant_type: 'authorization_code',
         code,
-        redirect_uri: SPOTIFY_REDIRECT_URI,
+        rredirect_uri: spotifyRedirectUri,
         code_verifier: codeVerifier
       })
     }
