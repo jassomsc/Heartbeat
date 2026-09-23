@@ -29,7 +29,10 @@ async function loadSpotifyConfig() {
     return true;
 
   } catch (error) {
-    console.error('No se pudo cargar la configuración de Spotify:', error);
+    console.error(
+      'No se pudo cargar la configuración de Spotify:',
+      error
+    );
     return false;
   }
 }
@@ -80,7 +83,6 @@ function base64encode(input) {
 // ==========================================
 
 async function connectSpotify() {
-
   const configLoaded = await loadSpotifyConfig();
 
   if (!configLoaded) {
@@ -97,15 +99,16 @@ async function connectSpotify() {
   const codeChallenge = base64encode(hashed);
 
   // Guardamos el verifier para cuando Spotify regrese
-sessionStorage.setItem(
-  'spotify_code_verifier',
-  codeVerifier
-);
+  sessionStorage.setItem(
+    'spotify_code_verifier',
+    codeVerifier
+  );
 
-localStorage.setItem(
-  'spotify_code_verifier_backup',
-  codeVerifier
-);
+  // Backup por si sessionStorage se pierde durante el redirect
+  localStorage.setItem(
+    'spotify_code_verifier_backup',
+    codeVerifier
+  );
 
   const authUrl = new URL(
     'https://accounts.spotify.com/authorize'
@@ -133,18 +136,21 @@ localStorage.setItem(
 // ==========================================
 
 async function getSpotifyToken(code) {
-
   await loadSpotifyConfig();
 
-const codeVerifier =
-  sessionStorage.getItem('spotify_code_verifier') ||
-  localStorage.getItem('spotify_code_verifier_backup');
+  const codeVerifier =
+    sessionStorage.getItem(
+      'spotify_code_verifier'
+    ) ||
+    localStorage.getItem(
+      'spotify_code_verifier_backup'
+    );
 
-if (!codeVerifier) {
-  throw new Error(
-    'No se encontró el code verifier de Spotify.'
-  );
-}
+  if (!codeVerifier) {
+    throw new Error(
+      'No se encontró el code verifier de Spotify.'
+    );
+  }
 
   const response = await fetch(
     'https://accounts.spotify.com/api/token',
@@ -197,15 +203,62 @@ if (!codeVerifier) {
     Date.now() + data.expires_in * 1000
   );
 
-sessionStorage.removeItem(
-  'spotify_code_verifier'
-);
+  sessionStorage.removeItem(
+    'spotify_code_verifier'
+  );
 
-localStorage.removeItem(
-  'spotify_code_verifier_backup'
-);
+  localStorage.removeItem(
+    'spotify_code_verifier_backup'
+  );
 
   return data.access_token;
+}
+
+
+// ==========================================
+// PETICIONES A SPOTIFY
+// ==========================================
+
+async function spotifyFetch(url) {
+  const token = localStorage.getItem(
+    'spotify_access_token'
+  );
+
+  const expires = Number(
+    localStorage.getItem(
+      'spotify_token_expires'
+    )
+  );
+
+  if (
+    !token ||
+    !expires ||
+    Date.now() >= expires
+  ) {
+    throw new Error(
+      'Spotify no está conectado o el token expiró.'
+    );
+  }
+
+  const response = await fetch(
+    url,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const details =
+      await response.text();
+
+    throw new Error(
+      `Spotify respondió ${response.status}: ${details}`
+    );
+  }
+
+  return response.json();
 }
 
 
@@ -214,7 +267,6 @@ localStorage.removeItem(
 // ==========================================
 
 async function getSpotifyTopArtists(token) {
-
   const response = await fetch(
     'https://api.spotify.com/v1/me/top/artists?limit=10&time_range=medium_term',
     {
@@ -241,7 +293,6 @@ async function getSpotifyTopArtists(token) {
 // ==========================================
 
 async function getSpotifyTopTracks(token) {
-
   const response = await fetch(
     'https://api.spotify.com/v1/me/top/tracks?limit=10&time_range=medium_term',
     {
@@ -268,9 +319,7 @@ async function getSpotifyTopTracks(token) {
 // ==========================================
 
 async function loadSpotifyTaste(token) {
-
   try {
-
     const [artists, tracks] =
       await Promise.all([
         getSpotifyTopArtists(token),
@@ -278,19 +327,21 @@ async function loadSpotifyTaste(token) {
       ]);
 
     const musicalProfile = {
+      artists: artists.map(
+        artist => ({
+          name: artist.name,
+          genres: artist.genres || []
+        })
+      ),
 
-      artists: artists.map(artist => ({
-        name: artist.name,
-        genres: artist.genres || []
-      })),
-
-      tracks: tracks.map(track => ({
-        title: track.name,
-        artist:
-          track.artists
+      tracks: tracks.map(
+        track => ({
+          title: track.name,
+          artist: track.artists
             .map(artist => artist.name)
             .join(', ')
-      }))
+        })
+      )
     };
 
     localStorage.setItem(
@@ -306,7 +357,6 @@ async function loadSpotifyTaste(token) {
     return musicalProfile;
 
   } catch (error) {
-
     console.error(
       'Error cargando gustos de Spotify:',
       error
@@ -318,21 +368,194 @@ async function loadSpotifyTaste(token) {
 
 
 // ==========================================
+// BUSCAR CANCIÓN EN SPOTIFY
+// ==========================================
+
+async function searchSpotifyTrack(
+  title,
+  artist
+) {
+  /*
+    Hacemos varias búsquedas porque los títulos
+    generados por la IA pueden tener pequeñas
+    diferencias respecto a Spotify.
+  */
+
+  const queries = [
+    `track:${title} artist:${artist}`,
+    `${title} ${artist}`,
+    title
+  ];
+
+  for (const query of queries) {
+    const url =
+      'https://api.spotify.com/v1/search' +
+      '?type=track' +
+      '&limit=10' +
+      `&q=${encodeURIComponent(query)}`;
+
+    const data =
+      await spotifyFetch(url);
+
+    const tracks =
+      data?.tracks?.items || [];
+
+    if (!tracks.length) {
+      continue;
+    }
+
+    const wantedTitle =
+      String(title || '')
+        .toLowerCase()
+        .trim();
+
+    const wantedArtist =
+      String(artist || '')
+        .toLowerCase()
+        .trim();
+
+    /*
+      Primero intentamos encontrar una coincidencia
+      de título + artista.
+    */
+    const bestMatch =
+      tracks.find(track => {
+        const foundTitle =
+          String(track.name || '')
+            .toLowerCase();
+
+        const foundArtists =
+          (track.artists || [])
+            .map(item =>
+              String(item.name || '')
+                .toLowerCase()
+            )
+            .join(' ');
+
+        return (
+          foundTitle.includes(
+            wantedTitle
+          ) &&
+          foundArtists.includes(
+            wantedArtist
+          )
+        );
+      }) || tracks[0];
+
+    if (bestMatch) {
+      return {
+        id: bestMatch.id,
+
+        uri: bestMatch.uri,
+
+        url:
+          bestMatch.external_urls
+            ?.spotify ||
+          `https://open.spotify.com/track/${bestMatch.id}`,
+
+        cover:
+          bestMatch.album
+            ?.images?.[0]?.url ||
+          bestMatch.album
+            ?.images?.[1]?.url ||
+          '',
+
+        title:
+          bestMatch.name,
+
+        artist:
+          (bestMatch.artists || [])
+            .map(item => item.name)
+            .join(', ')
+      };
+    }
+  }
+
+  return null;
+}
+
+
+// ==========================================
+// ENRIQUECER RECOMENDACIONES CON SPOTIFY
+// ==========================================
+
+async function enrichWithSpotify(
+  picks = []
+) {
+  if (!Array.isArray(picks)) {
+    return [];
+  }
+
+  if (!isSpotifyConnected()) {
+    console.warn(
+      'Spotify no está conectado; las recomendaciones se mostrarán sin portada ni reproductor.'
+    );
+
+    return picks;
+  }
+
+  const enriched =
+    await Promise.all(
+      picks.map(
+        async pick => {
+          try {
+            const spotify =
+              await searchSpotifyTrack(
+                pick.title,
+                pick.artist
+              );
+
+            if (!spotify) {
+              console.warn(
+                `Spotify no encontró: ${pick.title} — ${pick.artist}`
+              );
+
+              return pick;
+            }
+
+            console.log(
+              `Spotify encontró: ${pick.title} — ${pick.artist}`,
+              spotify
+            );
+
+            return {
+              ...pick,
+              spotify
+            };
+
+          } catch (error) {
+            console.error(
+              `Error buscando ${pick.title} — ${pick.artist}:`,
+              error
+            );
+
+            return pick;
+          }
+        }
+      )
+    );
+
+  return enriched;
+}
+
+
+// ==========================================
 // PROCESAR REGRESO DE SPOTIFY
 // ==========================================
 
 async function handleSpotifyCallback() {
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
 
-  const params = new URLSearchParams(
-    window.location.search
-  );
+  const code =
+    params.get('code');
 
-  const code = params.get('code');
-
-  const error = params.get('error');
+  const error =
+    params.get('error');
 
   if (error) {
-
     console.error(
       'Spotify authorization error:',
       error
@@ -350,7 +573,6 @@ async function handleSpotifyCallback() {
   }
 
   try {
-
     const token =
       await getSpotifyToken(code);
 
@@ -372,7 +594,6 @@ async function handleSpotifyCallback() {
     );
 
   } catch (error) {
-
     console.error(
       'Error conectando Spotify:',
       error
@@ -390,10 +611,10 @@ async function handleSpotifyCallback() {
 // ==========================================
 
 function isSpotifyConnected() {
-
-  const token = localStorage.getItem(
-    'spotify_access_token'
-  );
+  const token =
+    localStorage.getItem(
+      'spotify_access_token'
+    );
 
   const expires =
     Number(
@@ -417,14 +638,17 @@ function isSpotifyConnected() {
 document.addEventListener(
   'DOMContentLoaded',
   async () => {
-
     await loadSpotifyConfig();
 
     const spotifyButton =
-      document.getElementById('spotify-connect');
+      document.getElementById(
+        'spotify-connect'
+      );
 
     const spotifyStatus =
-      document.getElementById('spotify-status');
+      document.getElementById(
+        'spotify-status'
+      );
 
 
     // BOTÓN CONECTAR SPOTIFY
@@ -442,12 +666,12 @@ document.addEventListener(
 
     // ACTUALIZAR INTERFAZ
     if (isSpotifyConnected()) {
-
       if (spotifyButton) {
         spotifyButton.textContent =
           'Spotify conectado ✓';
 
-        spotifyButton.disabled = true;
+        spotifyButton.disabled =
+          true;
       }
 
       if (spotifyStatus) {
@@ -460,7 +684,6 @@ document.addEventListener(
       );
 
     } else {
-
       if (spotifyButton) {
         spotifyButton.textContent =
           'Conectar Spotify';
@@ -474,6 +697,21 @@ document.addEventListener(
 );
 
 
-// Dejamos disponible la función para tu botón
-window.connectSpotify = connectSpotify;
-window.isSpotifyConnected = isSpotifyConnected;
+// ==========================================
+// FUNCIONES DISPONIBLES PARA HEARTBEAT
+// ==========================================
+
+window.connectSpotify =
+  connectSpotify;
+
+window.isSpotifyConnected =
+  isSpotifyConnected;
+
+window.spotifyFetch =
+  spotifyFetch;
+
+window.searchSpotifyTrack =
+  searchSpotifyTrack;
+
+window.enrichWithSpotify =
+  enrichWithSpotify;
