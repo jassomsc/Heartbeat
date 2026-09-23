@@ -535,31 +535,17 @@ app.get('*catchall', (req, res) => {
 // INICIAR HEARTBEAT
 // ======================================================
 
-app.listen(port, () => {
+const server = app.listen(port, '127.0.0.1');
 
+server.on('listening', () => {
   console.log('');
   console.log('❤️  HEARTBEAT');
-
-  console.log(
-    `Heartbeat abierto en http://127.0.0.1:${port}`
-  );
-
-  console.log(
-    `IA: ${
-      client
-        ? 'API key detectada ✓'
-        : 'API key no detectada'
-    }`
-  );
-
-  console.log(
-    `Spotify: ${
-      process.env.SPOTIFY_CLIENT_ID
-        ? 'Client ID detectado ✓'
-        : 'Client ID no detectado'
-    }`
-  );
-
+  console.log(`Heartbeat abierto en http://127.0.0.1:${port}`);
+  console.log(`IA: ${client ? 'API key detectada ✓' : 'API key no detectada'}`);
+  console.log(`Spotify: ${process.env.SPOTIFY_CLIENT_ID ? 'Client ID detectado ✓' : 'Client ID no detectado'}`);
   console.log('');
+});
 
+server.on('error', (error) => {
+  console.error('No se pudo iniciar Heartbeat:', error);
 });
