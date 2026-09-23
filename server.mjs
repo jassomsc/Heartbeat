@@ -38,18 +38,23 @@ app.use(
 // CONFIGURACIÓN PARA SPOTIFY
 // ======================================================
 
-app.get('/api/config', (_req, res) => {
+app.get('/api/config', (req, res) => {
+
+  const isRender =
+    process.env.RENDER === 'true';
+
+  const redirectUri = isRender
+    ? 'https://heartbeat-rxh0.onrender.com/'
+    : `http://127.0.0.1:${port}/`;
 
   res.json({
     spotifyClientId:
       process.env.SPOTIFY_CLIENT_ID || '',
 
-    redirectUri:
-      `http://127.0.0.1:${port}/`
+    redirectUri
   });
 
 });
-
 
 // ======================================================
 // HEARTBEAT AI
@@ -889,15 +894,10 @@ app.get(
 // INICIAR HEARTBEAT
 // ======================================================
 
-const host =
-  process.env.RENDER
-    ? '0.0.0.0'
-    : '127.0.0.1';
-
 const server =
   app.listen(
     port,
-    host
+    '0.0.0.0'
   );
 
 server.on(
