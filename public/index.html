@@ -598,7 +598,15 @@ const match = Math.max(
     // ======================================================
 // COMPARTIR DEDICACIÓN
 // ======================================================
+function getSpotifyLink() {
+  if (!selectedSong) return '';
 
+  if (selectedSong.spotify?.url) {
+    return selectedSong.spotify.url;
+  }
+
+  return spotifySearchUrl(selectedSong);
+}
 function getDedicationText() {
   const textarea = document.querySelector('.dedication-card textarea');
 
