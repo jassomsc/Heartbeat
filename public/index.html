@@ -1351,7 +1351,23 @@ document
 
     document.getElementById('send-dedication').addEventListener('click',()=>showToast('¡Dedicatoria lista para compartir! ♥'));
 
-    (async()=>{await handleSpotifyCallback();await loadSpotifyConfig();if(spotifyToken)await loadSpotifyProfile();updateRecipient();dedicationCount.textContent=dedicationText.value.length;renderSongs(fallbackSongs);showScreen(1);})();
+    (async()=>{
+  const returnedFromSpotify =
+    new URLSearchParams(window.location.search).has('code');
+
+  await handleSpotifyCallback();
+  await loadSpotifyConfig();
+
+  if(spotifyToken) {
+    await loadSpotifyProfile();
+  }
+
+  updateRecipient();
+  dedicationCount.textContent = dedicationText.value.length;
+  renderSongs(fallbackSongs);
+
+  showScreen(returnedFromSpotify ? 2 : 1);
+})();
   </script>
 </body>
 </html>
