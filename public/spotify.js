@@ -601,9 +601,10 @@ async function handleSpotifyCallback() {
     );
 
     alert(
-      'Hubo un problema conectando Spotify.'
+      'ERROR SPOTIFY:\n\n' +
+      (error?.message || String(error))
     );
-  }
+  } 
 }
 
 
