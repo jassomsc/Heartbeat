@@ -662,8 +662,9 @@ document.addEventListener(
     }
 
 
-    // PROCESAR REGRESO DE SPOTIFY
-    await handleSpotifyCallback();
+// PROCESAR REGRESO DE SPOTIFY
+// El callback principal se procesa desde index.html
+// await handleSpotifyCallback();
 
 
     // ACTUALIZAR INTERFAZ
