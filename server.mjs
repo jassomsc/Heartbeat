@@ -889,12 +889,16 @@ app.get(
 // INICIAR HEARTBEAT
 // ======================================================
 
+const host =
+  process.env.RENDER
+    ? '0.0.0.0'
+    : '127.0.0.1';
+
 const server =
   app.listen(
     port,
-    '127.0.0.1'
+    host
   );
-
 
 server.on(
   'listening',
