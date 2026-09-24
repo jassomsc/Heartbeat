@@ -436,16 +436,53 @@
     }
 
     function spotifySearchUrl(song){ return `https://open.spotify.com/search/${encodeURIComponent(`${song.title} ${song.artist}`)}`; }
-    async function enrichWithSpotify(picks){
-      if(!spotifyToken) return picks;
-      const results=[];
-      for(const song of picks.slice(0,5)){
-        const data=await spotifyFetch(`https://api.spotify.com/v1/search?type=track&limit=1&q=${encodeURIComponent(`track:${song.title} artist:${song.artist}`)}`);
-        const track=data?.tracks?.items?.[0];
-        results.push({...song, spotify:track?{id:track.id,uri:track.uri,url:track.external_urls?.spotify,cover:track.album?.images?.[0]?.url}:null});
+    async function enrichWithSpotify(picks) {
+
+    const results = [];
+
+    for (const song of picks.slice(0, 5)) {
+
+      try {
+
+        const params =
+          new URLSearchParams({
+            title: song.title,
+            artist: song.artist
+          });
+
+        const response =
+          await fetch(
+            `/api/spotify/search?${params}`
+          );
+
+        const data =
+          await response.json();
+
+        results.push({
+          ...song,
+          spotify:
+            data?.track || null
+        });
+
+      } catch (error) {
+
+        console.warn(
+          'No se pudo encontrar en Spotify:',
+          song.title,
+          error
+        );
+
+        results.push({
+          ...song,
+          spotify: null
+        });
+
       }
-      return results;
+
     }
+
+    return results;
+  }
 
     function tasteScore(song){
       if(!spotifyProfile) return 0;
@@ -1199,7 +1236,7 @@ document
     }
 
 
-    showToast(
+    showtoast(
       'Creando tu Story de Heartbeat...'
     );
 
@@ -1249,15 +1286,7 @@ document
       ) {
 
         await navigator.share({
-
-          files: [file],
-
-          title:
-            `${selectedSong.title} · Heartbeat`,
-
-          text:
-            getDedicationText()
-
+          files: [file]
         });
 
 

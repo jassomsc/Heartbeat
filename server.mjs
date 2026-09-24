@@ -55,7 +55,180 @@ app.get('/api/config', (req, res) => {
   });
 
 });
+// ======================================================
+// SPOTIFY CATALOG
+// ======================================================
 
+let spotifyAppToken = '';
+let spotifyAppTokenExpires = 0;
+
+async function getSpotifyAppToken() {
+
+  if (
+    spotifyAppToken &&
+    Date.now() < spotifyAppTokenExpires
+  ) {
+    return spotifyAppToken;
+  }
+
+  const clientId =
+    process.env.SPOTIFY_CLIENT_ID;
+
+  const clientSecret =
+    process.env.SPOTIFY_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    throw new Error(
+      'Faltan las credenciales de Spotify.'
+    );
+  }
+
+  const credentials =
+    Buffer
+      .from(`${clientId}:${clientSecret}`)
+      .toString('base64');
+
+  const response = await fetch(
+    'https://accounts.spotify.com/api/token',
+    {
+      method: 'POST',
+
+      headers: {
+        Authorization:
+          `Basic ${credentials}`,
+
+        'Content-Type':
+          'application/x-www-form-urlencoded'
+      },
+
+      body:
+        'grant_type=client_credentials'
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error(
+      'Spotify token error:',
+      data
+    );
+
+    throw new Error(
+      'Spotify rechazó las credenciales.'
+    );
+  }
+
+  spotifyAppToken =
+    data.access_token;
+
+  spotifyAppTokenExpires =
+    Date.now() +
+    ((data.expires_in - 60) * 1000);
+
+  return spotifyAppToken;
+}
+
+
+app.get('/api/spotify/search', async (req, res) => {
+
+  try {
+
+    const title =
+      String(req.query.title || '').trim();
+
+    const artist =
+      String(req.query.artist || '').trim();
+
+    if (!title || !artist) {
+      return res.status(400).json({
+        error:
+          'Faltan título o artista.'
+      });
+    }
+
+    const token =
+      await getSpotifyAppToken();
+
+    const query =
+      `track:${title} artist:${artist}`;
+
+    const url =
+      'https://api.spotify.com/v1/search?' +
+      new URLSearchParams({
+        q: query,
+        type: 'track',
+        limit: '1',
+        market: 'MX'
+      });
+
+    const response =
+      await fetch(url, {
+        headers: {
+          Authorization:
+            `Bearer ${token}`
+        }
+      });
+
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+
+      console.error(
+        'Spotify search error:',
+        data
+      );
+
+      return res
+        .status(response.status)
+        .json({
+          error:
+            'No se pudo buscar la canción en Spotify.'
+        });
+
+    }
+
+    const track =
+      data?.tracks?.items?.[0];
+
+    if (!track) {
+      return res.json({
+        track: null
+      });
+    }
+
+    return res.json({
+      track: {
+        id:
+          track.id,
+
+        uri:
+          track.uri,
+
+        url:
+          track.external_urls?.spotify || '',
+
+        cover:
+          track.album?.images?.[0]?.url || ''
+      }
+    });
+
+  } catch (error) {
+
+    console.error(
+      'Spotify catalog error:',
+      error
+    );
+
+    return res.status(500).json({
+      error:
+        'No se pudo conectar con Spotify.'
+    });
+
+  }
+
+});
 // ======================================================
 // HEARTBEAT AI
 // ======================================================
